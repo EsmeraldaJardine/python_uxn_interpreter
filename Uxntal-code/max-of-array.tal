@@ -1,0 +1,35 @@
+|0100
+    ;n LDA #00 max-of-array
+    ;max LDA #18 DEO ( prints `*` )
+BRK
+
+@max-of-array ( upper-bound+1 lower-bound -- )
+    ;i STA ( store exp1 in i; exp2 )
+    &loop 
+        DUP ( because exp2 will be consumed; exp2 exp2 )
+        ;i LDA ( load the iterator )
+        SWP ( swap because we need i>exp2, not exp2>i )
+        GTH ( create Boolean which is true when loop is over; exp2 bool )
+        ,&loopdone JCN ( if condition true, exit loop; exp2 )
+            ( if x[i] > max then max = x[i] )
+            ;x ;i LDA ADD LDA ;max LDA GTH ,&update-max JCN
+            ,&continue JMP
+            &update-max
+            ;x ;i LDA ADD LDA ;max STA
+            &continue
+            ;i LDA INC ;i STA     ( increment loop counter at the end of the loop body ) 
+            ,&loop JMP
+        &loopdone
+JMP2r
+
+@i $1
+@max $1
+@n 07
+@x
+00 ( 0 )
+12 ( 18 )
+03 ( 3 )
+15 ( 21 )
+2a ( 42 )
+0e ( 14 )
+19 ( 25 ) 

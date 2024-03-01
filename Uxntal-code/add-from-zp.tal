@@ -1,0 +1,15 @@
+|0000
+@x $2
+@y $2
+@z $2
+|0100
+#0011 .x STZ2
+#0022 .y STZ2
+   .x LDZ2  ( x )
+   .y LDZ2 ( x y ) 
+   ADD2 ( x + y )
+   .z STZ2   ( z := x + y )
+  .z LDZ2 NIP #18 DEO
+  .z INC LDZ #18 DEO
+BRK
+

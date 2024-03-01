@@ -1,0 +1,38 @@
+|0000
+@z $1
+|0100
+rel-ld ( * )
+abs-ld ( * )
+rel-ld-child ( + )
+abs-ld-child ( + )
+rel-ld-local-child ( 0 )
+abs-ld-zp ( 0 )
+BRK
+
+@rel-ld
+,x LDR #18 DEO
+JMP2r
+
+@abs-ld
+;x LDA #18 DEO
+JMP2r
+
+@rel-ld-child
+,x/c LDR #18 DEO
+JMP2r
+
+@rel-ld-local-child
+,&c LDR #18 DEO
+JMP2r
+&c 30
+
+@abs-ld-child
+;x/c LDA #18 DEO
+JMP2r
+
+@abs-ld-zp
+.z LDZ #30 ADD #18 DEO
+JMP2r
+
+
+@x 2a &c 2b

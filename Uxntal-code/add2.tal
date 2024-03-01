@@ -1,0 +1,13 @@
+|0000
+|0100
+   ;x LDA2  ( x )
+   ;y LDA2 ( x y ) 
+   ADD2 ( x + y )
+   ;z STA2   ( z := x + y )
+  ;z LDA2 NIP #18 DEO
+  ;z INC LDA #18 DEO
+BRK
+@x 00 11
+@y 00 22
+@z $2
+

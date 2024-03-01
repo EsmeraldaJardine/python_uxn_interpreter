@@ -1,0 +1,62 @@
+|0100 ( ArrayMax )
+    ;n LDA #00 max-of-array
+    ;max LDA #18 DEO ( )
+BRK
+
+@max $1 ( will hold the max value )
+@i $1 ( iterator )
+@max-of-array
+    ;i STA ( store exp1 in i; exp2 )
+    &loop 
+        DUP ( because exp2 will be consumed; exp2 exp2 )
+        ;i LDA ( load the iterator )
+        SWP ( swap because we need i>exp2, not exp2>i )
+        GTH ( create Boolean which is true when loop is over; exp2 bool )
+        ,&loopdone JCN ( if condition true, exit loop; exp2 )
+            ( if x[i] > max then max = x[i] )
+            ;x ;i LDA ADD LDA ;max LDA signed-GTH ,&update-max JCN
+            ,&continue JMP
+            &update-max
+            ;x ;i LDA ADD LDA ;max STA
+            &continue
+            ;i LDA INC ;i STA ( increment loop counter at the end of the loop body ) 
+            ,&loop JMP
+        &loopdone
+JMP2r
+
+( if the value > 127 then it's negative 
+so we have:
+if x > 127 and y > 127 both are negative, so say x=130 = -126; y=140 = -116
+x y LTH
+
+if x > 127 and y < 127, y is pos, so false
+if x < 127 and y > 127, x is pos, so true
+else they are both pos, so GTH
+
+x y signed-GTH
+
+) 
+@signed-GTH
+DUP2 ( x y x y )
+#7f GTH ( x y x b1 ) 
+SWP  ( x y b1 x ) 
+#7f GTH ( x y b1 b2 ) 
+DUP2 MUL ( x y b1 b2 both-neg ) ,&both-neg JCN ( x y b1 b2 )
+DUP2 #0000 EQU2 ,&both-pos JCN ( x y b1 b2 )
+NIP2 POP JMP2r
+&both-neg
+POP2 LTH JMP2r
+&both-pos
+POP2 GTH JMP2r
+
+@n 07
+@x
+00 ( 0 )
+12 ( 18 )
+03 ( 3 )
+15 ( 21 )
+fe ( -2 )
+2a ( 42 )
+19 ( 25 ) 
+
+
