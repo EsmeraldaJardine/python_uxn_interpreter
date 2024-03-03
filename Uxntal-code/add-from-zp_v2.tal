@@ -1,0 +1,15 @@
+|0000
+@x $2
+@y $2
+@z $2
+|0100
+LIT2 0011 LIT -x STZ2
+LIT2 0022 LIT -y STZ2
+   LIT -x LDZ2  ( x )
+   LIT -y LDZ2 ( x y ) 
+   ADD2 ( x + y )
+   LIT -z STZ2   ( z := x + y )
+  LIT -z LDZ2 NIP LIT 18 DEO
+  LIT -z INC LDZ LIT 18 DEO
+BRK
+
