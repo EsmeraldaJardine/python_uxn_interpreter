@@ -1,3 +1,6 @@
+---
+linkcolor: blue
+---
 # Python features used in the course
 
 These are some less common features of Python that we will use in the course:
@@ -14,7 +17,7 @@ Also, but to be discussed later:
 * Bit masking and bit shifting
 
 
-## Exercise 
+## Exercise solution
 
 * Create a class with a number, a string and a boolean
 
@@ -36,9 +39,9 @@ Also, but to be discussed later:
     ```
 * Populate a list with instances of this class
 
-
     ```python
     """
+    There are of course many ways to do this. 
     I create a list of strings by splitting a string 
     """
 
@@ -48,7 +51,9 @@ Also, but to be discussed later:
         tachisukumu atashi ni 
         kimi wo tsurete wa konai
         """.split()
+    ```
 
+    ```python
     """
     I pad the strings with a single space at the end
     """
@@ -85,10 +90,10 @@ Also, but to be discussed later:
 
     ```python
     """
-        We take the tuple and modify each element:
-        the last characator of `string` is removed a slice `[0:t[1]-1]`;
-        the `length` is decremented;
-        the `touched` field is set to `True`
+    We take the tuple and modify each element:
+    the last characator of `string` is removed a slice `[0:t[1]-1]`;
+    the `length` is decremented;
+    the `touched` field is set to `True`
     """
     updatedStrTups = map( lambda t : (t[0][0:t[1]-1],t[1]-1,True), strTups)
 
@@ -99,5 +104,8 @@ Also, but to be discussed later:
     print(list(map(lambda t: t[0],updatedStrTups)))
     ```
 
+## Exercise solution code
+
+The code for the solution is available [on the CANS Git repo](https://git.dcs.gla.ac.uk/wim/cans/-/blob/main/Tutorials-code/tut-04-mar-2024-code.py?ref_type=heads") (needs VPN to access off campus).
 
 
