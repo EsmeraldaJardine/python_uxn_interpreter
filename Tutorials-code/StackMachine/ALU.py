@@ -1,14 +1,9 @@
-# Combinational arithmetic operations, implemented high-level
+from MuxDemux import *
+# Combinational arithmetic operations, implemented high-level to work with words of any size
+
 def ALU(a,b,opcode):
-    match opcode:
-        case 0:
-            res = a+b
-            # print('+',a,b,res)
-        case 1:
-            res = a-b
-        case 2:
-            res = a*b
-            # print('*',a,b,res)
-        case 3:
-            res=int(a/b)
+    ctrl = (opcode&1,opcode>>1)
+    ops=(a+b,a-b,a*b,a==b) # so we execute them in parallel and select the result with the mux
+    res = mux4word(ctrl,ops)
     return res
+

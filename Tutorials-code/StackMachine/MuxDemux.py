@@ -35,16 +35,19 @@ def mux4bit(ctrl4,in4):
     )
     return out
 
-# Word-size mux, 2 in to 1 out, implemented high-level
+# Word-size mux, 2 in to 1 out, implemented high-level to work with words of arbitrary size
+# As exercise, create one out of low-level components that works for 4-bit words
 def mux2word(ctrl,in2):
     return in2[ctrl]
 
-# Word-size mux, 4 in to 1 out, implemented high-level
+# Word-size mux, 4 in to 1 out, implemented high-level to work with words of arbitrary size
+# As exercise, create one out of low-level components that works for 4-bit words
 def mux4word(ctrl4,in4):
     ctrl = ctrl4[0]+2*ctrl4[1]
     return in4[ctrl]
 
-# Word-size demux, 1 in to 4 out, implemented high-level
+# Word-size demux, 1 in to 4 out, implemented high-level to work with words of arbitrary size
+# As exercise, create one out of low-level components that works for 4-bit words
 def demux4word(ctrl4,in1):
     ctrl = ctrl4[0]+2*ctrl4[1]
     out4 = (0,0,0,0)
