@@ -15,6 +15,7 @@ def decSP(sp):
     return (dec_a,dec_b)
 
 # Combinational: update one of the registers that make up the stack
+#! Change this to use the 4-bit-word mux `mux2word4bits` which you created in `MuxDemux.py`
 def updateReg(reg,ld,x):
     return mux2word(ld,(reg,x))
 
@@ -22,22 +23,20 @@ def updateReg(reg,ld,x):
 def readAB(stack,sp):
     dsp = decSP(sp)
     ddsp = decSP(dsp)
+    #! Change this to use the 4-bit-word mux `mux4word4bits` which you created in `MuxDemux.py`
     a = mux4word(dsp,stack)
     b = mux4word(ddsp,stack)
     t = (a,b)
     return t
 
-# Sequential: push `x` onto the stack if `push` == 1
+# Combinational: push `x` onto the stack if `push` == 1
 def pushOntoStack(x,push,stack,sp):
     out4 = demux4bit(sp,push)
     stack[0] = updateReg(stack[0],out4[0],x)
     stack[1] = updateReg(stack[1],out4[1],x)
     stack[2] = updateReg(stack[2],out4[2],x)
     stack[3] = updateReg(stack[3],out4[3],x)
-    # increment the stack pointer
-    if push:
-        sp = incSP(sp)
-    return (stack,sp)
+    return stack
 
 
 

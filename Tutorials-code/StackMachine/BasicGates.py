@@ -25,3 +25,4 @@ def OR4(a,b,c,d):
 def AND4(a,b,c,d):
     return AND(AND(a,b),AND(c,d))
 
+#! Derive a NAND and NOR gate
