@@ -1,7 +1,7 @@
 ---
 linkcolor: blue
 ---
-# Stack Machine
+# Tutorial 12 March 2024: Stack Machine
 
 * From the git repo [https://git.dcs.gla.ac.uk/wim/cans/-/tree/main/Tutorials-code/StackMachine](https://git.dcs.gla.ac.uk/wim/cans/-/tree/main/Tutorials-code/StackMachine), get the Python source files.
 * This is a Python implementation of a stack machine starting from basic gates. We use them to construct multiplexers and the register file.
