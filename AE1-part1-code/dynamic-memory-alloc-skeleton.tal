@@ -1,3 +1,7 @@
+( This is the suggested code skeleton for AE1
+  it also provides helper functions for printing
+)
+
 (
  Dynamic memory allocation using pages and a bitmap
 )
