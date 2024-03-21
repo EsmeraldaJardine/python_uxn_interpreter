@@ -2,23 +2,28 @@
 
 # Dynamic memory allocation using pages and a bitmap
 
-# We allocate 16 bytes per page, so 16kB
+# We allocate 16 bytes per page
 PAGE_SZ = 16 # in bytes
+# We have a total of 256 pages, so we can allocate at most 4kB
 N_PAGES = 1024>>2 
+VMEM_START = 64*1024-PAGE_SZ*N_PAGES
 
-# N_PAGES bits, packed in bytes mean N_PAGES/8 entries
+# N_PAGES bits, packed in bytes mean N_PAGES/8 entries, so with the above, the bitmap will take 64 bytes
 # 0 means free
 bitmap = [0] * (N_PAGES>>3)
 
-def malloc(mem_sz) :
+# Takes the number of bytes to be allocated
+# returns a pointer, i.e. the address of the start of the allocated memory region
+def malloc(n_bytes) :
     for idx in range(N_PAGES):
-        if alloc_sz_is_free_at_idx(idx, mem_sz):
-            claim_alloc_sz_at_idx(idx, mem_sz)
-            return (idx*PAGE_SZ)
-    return N_PAGES*PAGE_SZ
+        if alloc_sz_is_free_at_idx(idx, n_bytes):
+            claim_alloc_sz_at_idx(idx, n_bytes)
+            return (idx*PAGE_SZ+VMEM_START)
+    return 0 # Null pointer
 
-def free(idx,mem_sz) :
-    free_alloc_sz_at_idx(idx, mem_sz)
+def free(ptr,n_bytes) :
+    idx = (ptr-VMEM_START)/PAGE_SZ
+    free_alloc_sz_at_idx(idx, n_bytes)
 
 def get_bit(idx) :
     byte_idx = idx >> 3

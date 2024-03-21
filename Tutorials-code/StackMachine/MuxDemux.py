@@ -5,14 +5,14 @@ from BasicGates import *
 # Helper circuit which turns a bus of n bits into 2^n wires of which only one is high
 def control2BitsTo4Wires(ctrl4):
     t =(
-        AND(NOT(ctrl4[0]),NOT(ctrl4[1])), # 00
+        AND(NOT(ctrl4[0]),NOT(ctrl4[1])), # 00 
         AND(ctrl4[0],NOT(ctrl4[1])), #01
         AND(NOT(ctrl4[0]),ctrl4[1]), #10
         AND(ctrl4[0],ctrl4[1]) #11
     )
     return t
 
-# Bit-size demux, 1 in to 4 out
+# Bit-size demux, 2 bits control, data 1 in to 4 out
 def demux4bit(ctrl4,in1):
     w4=control2BitsTo4Wires(ctrl4)
     out4 = (
@@ -34,7 +34,7 @@ def mux4bit(ctrl4,in4):
     )
     return out
 
-# Word-size mux, 2 in to 1 out, implemented high-level to work with words of arbitrary size
+# Word-size mux, 1-bit control, 2 in to 1 out, implemented high-level to work with words of arbitrary size
 def mux2word(ctrl,in2):
     return in2[ctrl]
 

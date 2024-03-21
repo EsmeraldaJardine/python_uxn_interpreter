@@ -1,0 +1,220 @@
+(
+ Dynamic memory allocation using pages and a bitmap
+)
+
+%PAGE_SZ { #0010 } ( We allocate 16 bytes per page )
+%N_PAGES { #0100 } ( We have a total of 256 pages, so we can allocate at most 4kB )
+%VMEM_START { #f000 } ( Start at 60*1024 )
+
+|0000
+( I suggest you use the zero page for temporary storage )
+
+|0100
+(
+Run your tests here
+)
+BRK
+
+( define your tests here )
+
+( definitions of malloc, free and functions used to implement them )
+@malloc ( n_bytes -- <allocation in bytes> )
+    ( 
+    for idx in range(N_PAGES):
+        if alloc_sz_is_free_at_idx(idx, n_bytes):
+            claim_alloc_sz_at_idx(idx, n_bytes)
+            return (idx*PAGE_SZ)
+    return 0
+    )
+
+@free ( ptr n_bytes )
+    SWP2 #f000 SUB2 PAGE_SZ DIV2
+    ;free_alloc_sz_at_idx JMP2
+
+@get_bit ( idx -- bit )
+    ( 
+    byte_idx = idx >> 3 
+    bit_idx = 7 - (idx - (byte_idx<<3))
+    if byte_idx > N_PAGES-1:
+        print("Outside of page range:", byte_idx)
+        exit(0)
+    byte = bitmap[byte_idx]
+    if byte is None:
+        print("Invalid access:", byte_idx)
+        exit(0)
+    bit = (byte >> bit_idx) & 0x01
+    return bit 
+    )
+
+@set_bit ( idx -- )
+    ( 
+    byte_idx = idx >> 3
+    bit_idx = 7 - idx + (byte_idx<<3)
+    byte = bitmap[byte_idx]
+    mask = 1 << bit_idx
+    bitmap[byte_idx] = byte | mask 
+    )
+
+@clear_bit ( idx -- )
+    ( 
+    byte_idx = idx >> 3
+    bit_idx = 7 - idx + (byte_idx<<3)
+    byte = bitmap[byte_idx]
+    mask = 0xFF ^ (1 << bit_idx) # 1110111
+    bitmap[byte_idx] = byte & mask 
+    )
+
+
+( allocation size is in pages )
+@alloc_sz_is_free_at_idx ( idx alloc_sz -- 00 or 01 )
+    ( 
+    for jj in range(alloc_sz)
+        if(idx+jj>N_PAGES-1):
+            return 0 
+        if (get_bit(idx+jj)==1):
+            return 0 
+    return 1 
+    )
+
+@claim_alloc_sz_at_idx ( idx alloc_sz ) 
+    ( 
+    for jj in range(alloc_sz):
+        set_bit(idx+jj) 
+    )
+
+@free_alloc_sz_at_idx ( idx alloc_sz ) 
+    ( for jj in range(alloc_sz):
+        clear_bit(idx+jj) 
+    )
+
+
+( Functions for printing )
+
+( print a byte b as hex )
+( b -- )
+@print8
+    DUP ( b b )
+    DUP ( b b b )
+    ;lonib JSR2 ( b lo )
+    ;h2a JSR2 ( b lo_a )
+    SWP ( lo_a b )
+    ;hinib JSR2 ( lo_a hi )
+    ;h2a JSR2 ( lo_a hi_a )
+    #18 DEO #18 DEO POP
+    JMP2r
+
+( print a 2-byte "short" word as hex )
+@print16
+    SWP
+    ;print8 JSR2
+    ( SWP )
+    ;print8 JSR2
+    JMP2r
+
+( b8 & 0x0f )
+@lonib
+    #0f AND
+    JMP2r
+( b8 >> 4 )
+@hinib
+    #04 SFT
+    JMP2r
+
+( if <10 then 30 else 57 )
+( implemented as (a<10)*0x30+(a>=10)*0x57 )
+@h2a
+    DUP ( h h )
+    #0a LTH ( h (h<10) )
+    DUP ( h (h<10) )
+    #01 SWP SUB ( h (h<10) 1-(h<10) )
+    #57 MUL ( h (h<10) (1-(h<10))*0x57 )
+    SWP ( h (1 (h<10))*0x57 (h<10) )
+    #30 MUL ( h (1 (h<10))*0x57 (h<10)*0x30 )
+    ADD ( h (1 (h<10))*0x57 (h<10)*0x30 )
+    ADD ( h+(1 (h<10))*0x57 (h<10)*0x30 )
+    JMP2r
+
+( To print a 1-byte unsigned integer 
+as a decimal number of 3 digits )
+@print8-dec
+( h = x/100 )
+DUP ( x x ) 
+DUP #64  LTH ,&d2 JCN 
+#64 DIV ( x h ) DUP #30 ADD #18 DEO ( x h )
+( d = x - 100*h )
+#64 MUL SUB ( d )
+( t = d / 10 )
+DUP ( d d )
+&d2
+DUP #0a  LTH ,&d3 JCN
+#0a DIV ( d t ) DUP #30 ADD #18 DEO ( d t )
+( e = d - 10*t )
+#0a MUL SUB ( e ) 
+DUP ( e e )
+&d3
+#30 ADD #18 DEO
+POP
+JMP2r
+( To print a 2-byte unsigned integer 
+as a decimal number of 5 digits )
+( x:16 -> -- )
+@print16-dec
+    DUP2 ( x:16 x:16 )
+    DUP2 #2710 LTH2 ,&d2 JCN
+    ( T = x/10000 )
+    #2710 DIV2 ( x:16 T:16 ) DUP #30 ADD #18 DEO
+    ( Dt = x - 10000*T )
+    #2710 MUL2 SUB2 ( Dt )
+    DUP2 ( Dt Dt )
+    &d2
+    DUP2 #03e8  LTH2 ,&d3 JCN
+    ( D = Dt / 1000 )
+    #03e8 DIV2 ( Dt D ) DUP #30 ADD #18 DEO
+    ( ht = Dt-D*1000 )
+    #03e8 MUL2 SUB2  ( ht )
+    DUP2 ( ht ht )
+    &d3
+    DUP2 #0064  LTH2 ,&d4 JCN
+    ( h = ht /100 )
+    #0064 DIV2 ( ht h ) DUP #30 ADD #18 DEO
+    ( tt = ht - h*100 )
+    #0064 MUL2 SUB2 ( tt )
+    DUP2 ( tt tt )
+    &d4
+    ( t = tt / 10 )
+    #000a DIV2 ( tt t ) DUP #30 ADD #18 DEO
+    ( e = tt - 10*t )
+    #000a MUL2 SUB2 ( e ) #30 ADD #18 DEO POP
+    JMP2r
+
+( To print a string )
+( The string starts with a 2-byte lenght field )
+@print-str
+    LDA2k ( ;str size )
+    SWP2 #0002 ADD2 SWP2 ( ;str+3 size )
+    DUP2 ( ;str+2 size size )
+    ( So we test if that is 0 and if not we keep going )
+    &loop
+    #0000 EQU2 ,&exit JCN ( ;str+3 size )
+    SWP2 ( size ;str+3 )
+    LDAk #18 DEO ( size ;str+3 )
+    INC2 SWP2 #0001 SUB2 DUP2 ( ;str+4 size-1 size-1 )
+    ,&loop JMP
+    &exit
+    POP2 POP2
+    JMP2r
+
+( example strings )
+@invalid-str 000f "Invalid 20 "access:
+@outside-str 0016 "Outside 20 "of 20 "page 20 "range:
+
+( END of functions for printing and strings )
+
+ ( N_PAGES bits, packed in bytes mean N_PAGES/8 entries, so with the above, the bitmap will take 64 bytes )
+ ( 0 means free )
+@bitmap $40
+
+( The allocation happens below this )
+|f000
+@vmem
+

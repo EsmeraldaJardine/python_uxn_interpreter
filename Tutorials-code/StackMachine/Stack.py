@@ -1,13 +1,13 @@
 from MuxDemux import *
 
-# Sequential: Increment the stack pointer, modulo 4
+# Combinational: Increment the stack pointer, modulo 4
 def incSP(sp):
     a,b = sp
     inc_b = XOR(a,b)
     inc_a = NOT(a)
     return (inc_a,inc_b)
 
-# Sequential: Decrement the stack pointer, modulo 4
+# Combinational: Decrement the stack pointer, modulo 4
 def decSP(sp):
     a,b = sp
     dec_b = XNOR(a,b)

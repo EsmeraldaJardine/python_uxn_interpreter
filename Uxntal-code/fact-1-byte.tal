@@ -1,0 +1,28 @@
+|0100
+
+LIT 01 ( acc )
+LIT 05 ( dec )
+
+&loop
+	DUP ROT MUL SWP
+	( MULk ROT ROT NIP ) ( 4 4 ) ( 12 3  ) ( 24 1 )
+	#01 SUB DUP ( 4 3 3 ) ( 12 2 2  )
+	,&loop JCN ( 4 3 ) ( 12 2 ) 
+	POP
+	#18 DEO
+BRK
+
+( OR
+|0100
+
+LIT 05 ( dec )
+LIT 01 ( acc )
+&loop
+	OVR MUL ( dec acc*dec )
+	SWP #01 SUB SWP OVR ( dec-1 acc*dec dec-1  ) ( 12 2 2  )
+	,&loop JCN ( 4 3 ) ( 12 2 ) 
+	NIP
+	#18 DEO
+BRK
+
+)
