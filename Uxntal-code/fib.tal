@@ -1,0 +1,71 @@
+( 
+    Recursive computation of Fibonacci numbers 
+    to illustrate call stack with callee save strategy
+)
+|0100
+#0001 &loop DUP2 DUP2 
+fib print ws DUP2 
+fib-rs print ws
+fib-regs-callee-saves print nl
+INC2 DUP2 #0006 LTH2 ,&loop JCN
+BRK 
+
+( keep everything on the working stack )
+@fib ( n* -- fibn* )
+    #0001 GTH2k ,&cont JCN ( n* < 1* goto ret1 ; n* 1* )
+    NIP2 JMP2r
+    &cont
+    SUB2k fib ( call fib on n-1 ; n* 1* (n*-1* fib) )
+    ROT2 ROT2 ( (n*-1* fib) n* 1* )
+    INC2 SUB2 fib ( call fib on n-1 ; (n*-2* fib) (n*-1* fib) )
+    ADD2 ( return the result: (n*-2* fib)+(n*-1* fib) )
+    JMP2r
+
+( using the return stack for temp values )
+@fib-rs ( num* -- numfib* )
+	#0001 GTH2k ,&cont JCN ( num* > 1* goto ok; num* 1* )
+	NIP2 JMP2r ( num* )
+    &cont ( num* 1* )
+	SUB2k fib 
+    STH2 ( num* 1* | (num*-1* fib)  )
+	INC2 SUB2 fib 
+    STH2r 
+    ADD2 ( (num*-2* fib)+(num*-1* fib) )
+JMP2r
+
+( Use registers instead of the ws. This will NOT work! )
+@fib-regs-NOT-OK
+    ,&n STR2
+    ,&n LDR2 #0001 GTH2 ,&cont JCN
+        #0001
+        ,&restore JMP
+    &cont
+        ,&n LDR2 #0001 SUB2 fib-regs-callee-saves ,&nm1 STR2 ( call fib on n-1 )
+        ,&n LDR2 #0002 SUB2 fib-regs-callee-saves ,&nm2 STR2 ( call fib on n-2 )
+        ,&nm1 LDR2 ,&nm2 LDR2 ADD2 ( return the result: (n-1 fib)+(n-2 fib) )
+JMP2r
+&n $2 &nm1 $2 &nm2 $2
+
+( Callee saves )
+@fib-regs-callee-saves
+    ( save n, nm1 and nm2 on the rs )
+    ,&n LDR2 STH2 ,&nm1 LDR2 STH2 ,&nm2 LDR2 STH2 
+    ( n* | n'* nm1'* nm2'* ) 
+    ,&n STR2 ( -- | n'* )
+    ,&n LDR2 #0001 GTH2 ,&cont JCN ( n* > 1* goto cont )
+         #0001 ( 1* )
+        ,&restore JMP
+    &cont
+        ,&n LDR2 #0001 SUB2 fib-regs-callee-saves ,&nm1 STR2 ( call fib on n-2  )
+        ,&n LDR2 #0002 SUB2 fib-regs-callee-saves ,&nm2 STR2 ( call fib on n-2 )
+        ,&nm1 LDR2 ,&nm2 LDR2 ADD2 ( return the result: (n*-2* fib)+(n*-1* fib) )
+    &restore 
+    ( restore n, nm1 and nm2 from the rs )
+    STH2r ,&nm2 STR2 STH2r ,&nm1 STR2 STH2r ,&n STR2 ( fib-n* )
+JMP2r
+&n $2 &nm1 $2 &nm2 $2
+
+( printing )
+@print NIP #30 ADD #18 DEO JMP2r
+@nl #0a18 DEO JMP2r
+@ws #2018 DEO JMP2r
