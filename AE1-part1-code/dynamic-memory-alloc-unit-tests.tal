@@ -1,6 +1,8 @@
 ( Dynamic memory allocation using pages and a bitmap )
 ( Unit tests for each function except `malloc` and `free` )
 
+( This code will not assemble unless you've added all functions to be tested )
+
 |0000
 ( zero page temporary storage )
 @idx $2 @jj $2
