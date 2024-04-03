@@ -149,7 +149,7 @@ def executeInstr(token,uxn):
 
 #!! Tokenise the program text using a function `tokeniseProgramText` 
 #! That means splitting the string `programText` on whitespace 
-#! You must remove any comments first 
+#! You must remove any comments first, I suggest you use a helper function stripComments
 #! `tokenStrings` is a list of all tokens as strings
 def tokeniseProgramText(programText):
     #! ...

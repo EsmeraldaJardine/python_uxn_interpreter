@@ -1,0 +1,92 @@
+|0000
+@i $1
+|0100 ( ... )
+;print-ret-addr JSR2
+loop-jump-rel
+loop-jump-abs
+loop-call
+BRK
+
+@print-ret-addr 
+STH2rk print16
+#0a18 DEO
+JMP2r ( same as STH2r JMP2 )
+
+@loop-jump-rel
+    #00 .i STZ 
+    &loop
+        .i LDZ #05 EQU ,&done JCN
+        .i LDZ DUP #30 ADD #18 DEO
+        INC .i STZ
+        ,&loop JMP
+    &done
+    #0a18 DEO
+JMP2r
+
+@loop-jump-abs
+    #00 .i STZ 
+    @loop
+        .i LDZ #05 EQU ,&done JCN
+        .i LDZ DUP #30 ADD #18 DEO
+        INC .i STZ
+        ;loop JMP2
+        &done
+    #0a18 DEO
+JMP2r
+
+@loop-call
+    #00 .i STZ 
+    @loop
+        .i LDZ #05 EQU ,&done JCN
+        .i LDZ DUP #30 ADD #18 DEO
+        INC .i STZ
+        ;loop JSR2
+        &done
+        #0a18 DEO
+    JMP2r
+
+
+( the print* JSR2s do not affect the stack )
+( b8 & 0x0f )
+@lonib
+    #0f AND
+    JMP2r
+( b8 >> 4 )
+@hinib
+    #04 SFT
+    JMP2r
+
+( if <10 then 30 else 57 )
+( implemented as (a<10)*0x30+(a>=10)*0x57 )
+@h2a
+    DUP ( h h )
+    #0a LTH ( h (h<10) )
+    DUP ( h (h<10) )
+    #01 SWP SUB ( h (h<10) 1-(h<10) )
+    #57 MUL ( h (h<10) (1-(h<10))*0x57 )
+    SWP ( h (1 (h<10))*0x57 (h<10) )
+    #30 MUL ( h (1 (h<10))*0x57 (h<10)*0x30 )
+    ADD ( h (1 (h<10))*0x57 (h<10)*0x30 )
+    ADD ( h+(1 (h<10))*0x57 (h<10)*0x30 )
+    JMP2r
+
+( print a byte b as hex )
+( b -- )
+@print8
+    DUP ( b b )
+    DUP ( b b b )
+    ;lonib JSR2 ( b lo )
+    ;h2a JSR2 ( b lo_a )
+    SWP ( lo_a b )
+    ;hinib JSR2 ( lo_a hi )
+    ;h2a JSR2 ( lo_a hi_a )
+    #18 DEO #18 DEO POP
+    JMP2r
+
+( print a 2-byte "short" word as hex )
+@print16
+    SWP
+    ;print8 JSR2
+    ( SWP )
+    ;print8 JSR2
+    JMP2r

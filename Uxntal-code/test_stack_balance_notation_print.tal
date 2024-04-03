@@ -1,0 +1,49 @@
+(
+ Dynamic memory allocation using pages and a bitmap
+)
+
+
+|0100
+( unit test for get-bit )
+#7188 print16
+BRK
+
+( Functions for printing )
+@lonib ( a -: b )
+    #0f AND
+    JMP2r
+
+@hinib ( a -: b )
+    #04 SFT
+    JMP2r
+
+
+@h2a ( a -: b )
+    DUP 
+    #0a LTH
+    DUP 
+    #01 SWP SUB
+    #57 MUL 
+    SWP 
+    #30 MUL
+    ADD 
+    ADD 
+    JMP2r
+
+
+@print8 ( a -: )
+    DUP
+    DUP
+    lonib 
+    h2a 
+    SWP
+    hinib 
+    h2a 
+    #18 DEO #18 DEO POP
+    JMP2r
+
+@print16 ( a* -: )
+    SWP
+    print8 
+    print8
+    JMP2r

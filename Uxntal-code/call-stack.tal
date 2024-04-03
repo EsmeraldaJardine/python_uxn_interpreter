@@ -1,0 +1,61 @@
+|0000
+@csp $2
+@fp $2
+
+( stack frame structure:
+
+k3+2 .. k4-1: anything that needs saving (local variables, registers)
+k3+1: return address
+k3+0: k2
+----
+k2+2 .. k3-1: anything that needs saving (local variables, registers)
+k2+1: return address
+k2+0: k1
+----
+k1+2 .. k2-1: anything that needs saving (local variables, registers)
+k1+1: return address
+k1+0: k0
+----
+k0+2 .. k1-1: anything that needs saving (local variables, registers)
+k0+1: return address
+k0+0: pointer to prev stack frame, initially 0
+----
+)
+@init-call-stack 
+;call-stack .csp STZ2
+#0000 .fp STZ2
+JMP2r
+
+@push-fp 
+( write current fp at location of csp )
+.fp LDZ2 .csp LDZ2 STA2
+( increment csp )
+.csp LDZ2 INC2 .csp STZ2
+JMP2r
+
+@push-ra 
+( write current ra at location of csp )
+STH2rk .csp LDZ2 INC2 STA2
+( increment csp )
+.csp LDZ2 INC2 .csp STZ2
+JMP2r
+
+@push-frame 
+push-fp
+push-ra 
+JMP2r
+
+@push
+.csp LDZ2 STA2
+.csp LDZ2 INC2 .csp STZ2
+JMP2r
+
+@pop-frame
+( set csp to fp )
+.fp LDZ2 .csp STZ2
+( set fp to )
+.fp LDZ2 LDZ2 .fp STZ2
+JMP2r
+
+|0400 
+@call-stack ( grows down )
