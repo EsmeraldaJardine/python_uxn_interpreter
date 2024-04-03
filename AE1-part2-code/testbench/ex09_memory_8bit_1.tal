@@ -1,15 +1,8 @@
 |0100
-#00 ;sum STA
-
 ;write_array ;action STA2
 #10 ;loop JSR2
 
-;sum_array ;action STA2
-#10 ;loop JSR2
-
-;sum LDA ( working stack now has 0x88, 136 in decimal )
-#02 DIV #18 DEO
-
+;array #000f ADD2 LDA #03 MUL #18 DEO ( prints 0 )
 BRK
 ( niters:16 -> -- )
 @loop
@@ -17,13 +10,12 @@ BRK
     #00
     &for
     INC ( increment )
-    ( DUP #30 ADD #18 DEO )
-    DUP ( duplicate the counter so that it can be consumed )
+    ( DUP  duplicate the counter so that it can be consumed )
     ;action LDA2 JSR2
-    OVR OVR
+    OVR OVR 
     ( DUP the comparison also consumes the counter )
-    NEQ
-    ,&for JCN
+    NEQ 
+    ,&for JCN 
     POP POP
     JMP2r
 
@@ -32,20 +24,11 @@ BRK
 ( cnt:16 -> -- )
 ( we write the value of count to @array )
 @write_array
-    DUP #00 SWP
-    ;array ADD2 STA
+
+    DUP DUP #00 SWP 
+    ;array ADD2 #0001 SUB2 STA 
     JMP2r
 
-( cnt:16 -> -- )
-@sum_array
-    #00 SWP
-    ;array ADD2 LDA
-
-    ;sum LDA ADD
-    ;sum STA
-    JMP2r
-
-@sum $1
 @action $2
 |0200
 @array $10

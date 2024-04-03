@@ -10,7 +10,7 @@ JSR2 ( jump to this address and store the current address so we can return to it
 ( we can call subroutines as many times as we like )
 #02 #03 ;sum-sq JSR2 ( this will return 13, #0d on the stack )
 
-ADD2 #18 DEO ( prints '&' because 25+13=38 and that is the ASCII code for '&' )
+ADD #18 DEO ( prints '&' because 25+13=38 and that is the ASCII code for '&' )
 
 
 BRK
