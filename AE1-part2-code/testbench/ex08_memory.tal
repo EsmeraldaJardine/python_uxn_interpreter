@@ -3,13 +3,13 @@
 
 ;write_array 
 #0010 ;loop JSR2 
-BRK
+
 ;sum_array 
 #0010 ;loop JSR2 
 
 ;sum LDA2 ( working stack now has 0x88, 136 in decimal )
 
-NIP #5e SUB #18 DEO ( prints '*' )
+#5e SUB #18 DEO ( prints '*' )
 
 BRK
 ( niters:16 -> -- )
@@ -38,13 +38,13 @@ BRK
 ( we write the value of count to @array )
 @write_array     
     DUP2 #0002 MUL2 
-    ;array ADD2 STA2  
+    ;array ADD2 #0002 SUB2 STA2  
     JMP2r
 
 ( cnt:16 -> )
 @sum_array    
     #0002 MUL2
-    ;array ADD2 LDA2  
+    ;array ADD2 #0002 SUB2 LDA2  
     ;sum LDA2 ADD2 
     ;sum STA2
     JMP2r
