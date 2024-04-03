@@ -1,16 +1,16 @@
 |0000
 @i $1
 |0100 ( ... )
-;print-ret-addr JSR2
-loop-jump-rel
-loop-jump-abs
-loop-call
+    ;print-ret-addr JSR2
+    loop-jump-rel
+    loop-jump-abs
+    loop-call
 BRK
 
 @print-ret-addr 
-STH2rk print16
-#0a18 DEO
-JMP2r ( same as STH2r JMP2 )
+    STH2rk print16
+    #0a18 DEO
+    JMP2r ( same as STH2r JMP2 )
 
 @loop-jump-rel
     #00 .i STZ 

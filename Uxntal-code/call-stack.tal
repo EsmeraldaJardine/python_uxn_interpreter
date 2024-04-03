@@ -1,6 +1,6 @@
 |0000
-@csp $2
-@fp $2
+@csp $2 ( call stack pointer )
+@fp $2 ( frame pointer )
 
 ( stack frame structure:
 
@@ -21,40 +21,84 @@ k0+1: return address
 k0+0: pointer to prev stack frame, initially 0
 ----
 )
+
+|0100
+    init-call-stack 
+    #0020 #0001 example-call-stack-level-1    
+BRK
+
+( _ v:16 idx:16 -- )
+@example-call-stack-level-1
+    SWP2 OVR2 ( _ idx:16 v:16 idx:16 -- )
+    push-frame
+    #0008 alloc-local-array ( _ idx:16 v:16 idx:16 array:16 )
+    ADD2 STA2k ( stores v at pos idx of the local array; _ idx:16 v:16 array+idx:16 )
+    ROT2 ROT2 ( _ array+idx:16 idx:16 v:16 )
+    #0001 ADD2 SWP2 ( _ array+idx:16 v+1:16 idx:16 )
+    #2a18 DEO 
+    example-call-stack-level-2 ( we do the same again with v+1:16 )
+    ( when we return here, the local array is still on the stack )
+    ( array+idx:16 ) 
+    #2a18 DEO
+    LDA2 ( v:16 ) NIP #40 ADD #18 DEO ( -- )
+    pop-frame
+    JMP2r
+    
+@example-call-stack-level-2
+    SWP2 OVR2 ( _ idx:16 v:16 idx:16 -- )
+    push-frame
+    #0008 alloc-local-array ( _ idx:16 v:16 idx:16 array:16 )
+    ADD2 STA2k ( stores v at pos idx of the local array; _ idx:16 v:16 array+idx:16 )
+    ROT2 ROT2 ( _ array+idx:16 idx:16 v:16 )
+    ADD2 ( _ array+idx:16 v+idx:16 )
+    SWP2
+    ( v+idx:16 array+idx:16 ) 
+    #3c18 DEO
+    LDA2 ( v+idx:16 v:16 ) ADD2 ADD #18 DEO ( -- )
+    #3e18 DEO
+    pop-frame
+    JMP2r
+    
+
 @init-call-stack 
 ;call-stack .csp STZ2
-#0000 .fp STZ2
+;call-stack .fp STZ2 ( frame pointer is initially 0 from the bottom of the call stack )
 JMP2r
 
-@push-fp 
+@push-frame-pointer 
 ( write current fp at location of csp )
 .fp LDZ2 .csp LDZ2 STA2
 ( increment csp )
 .csp LDZ2 INC2 .csp STZ2
 JMP2r
 
-@push-ra 
+@push-return-address
 ( write current ra at location of csp )
 STH2rk .csp LDZ2 INC2 STA2
 ( increment csp )
 .csp LDZ2 INC2 .csp STZ2
 JMP2r
 
-@push-frame 
-push-fp
-push-ra 
+@push-short
+.csp LDZ2 STA2
+.csp LDZ2 INC2 INC2 .csp STZ2
 JMP2r
 
-@push
-.csp LDZ2 STA2
-.csp LDZ2 INC2 .csp STZ2
+@push-frame 
+push-frame-pointer
+push-return-address
 JMP2r
 
 @pop-frame
 ( set csp to fp )
 .fp LDZ2 .csp STZ2
-( set fp to )
-.fp LDZ2 LDZ2 .fp STZ2
+( set fp to pref fp )
+.fp LDZ2 LDA2 .fp STZ2
+JMP2r
+
+( nbytes:16 -- array:16 )
+@alloc-local-array
+.csp LDZ2 DUP2 ROT2 ROT2 ADD2 .csp STZ2
 JMP2r
 
 |0400 

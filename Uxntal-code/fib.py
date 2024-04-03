@@ -10,7 +10,8 @@ def fib_(n):
     else:
         nm1 = fib_(n-1)
         nm2 = fib_(n-2)
-        return nm1+nm2
+        nfib = nm1+nm2
+        return nfib
 
 for n in range(11):
     print(fib(n))

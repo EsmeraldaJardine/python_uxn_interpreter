@@ -3,11 +3,11 @@
     to illustrate call stack with callee save strategy
 )
 |0100
-#0001 &loop DUP2 DUP2 
-fib print ws DUP2 
-fib-rs print ws
-fib-regs-callee-saves print nl
-INC2 DUP2 #0006 LTH2 ,&loop JCN
+    #0001 &loop DUP2 DUP2 ( this is a loop from 1 to 5 )
+        fib print ws DUP2 
+        fib-rs print ws
+        fib-regs-callee-saves print nl
+    INC2 DUP2 #0006 LTH2 ,&loop JCN
 BRK 
 
 ( keep everything on the working stack )
