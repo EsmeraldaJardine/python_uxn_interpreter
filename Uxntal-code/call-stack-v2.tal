@@ -1,0 +1,193 @@
+|0000
+@csp $2 ( call stack pointer )
+@fp $2 ( frame pointer, it points to the *previous* frame )
+
+( stack frame structure:
+
+k3+2 .. k4-1: anything that needs saving (local variables, registers)
+k3+1: return address
+k3+0: k2
+----
+k2+2 .. k3-1: anything that needs saving (local variables, registers)
+k2+1: return address
+k2+0: k1
+----
+k1+2 .. k2-1: anything that needs saving (local variables, registers)
+k1+1: return address
+k1+0: k0
+----
+k0+2 .. k1-1: anything that needs saving (local variables, registers)
+k0+1: return address
+k0+0: pointer to prev stack frame, initially 0
+----
+)
+
+|0100
+    init-call-stack
+    #0020 #0001 example-call-stack-level-1
+BRK
+
+( _ v:16 idx:16 -- )
+@example-call-stack-level-1
+        #3118 DEO ws
+    SWP2 OVR2 ( _ idx:16 v:16 idx:16 -- )
+    push-frame
+    #0008 alloc-local-array ( _ idx:16 v:16 idx:16 array:16 )
+    ADD2 STA2k ( stores v at pos idx of the local array; _ idx:16 v:16 array+idx:16 )
+        print16 nl ( prints the address of array[idx], array+idx )
+    SWP2 ( _ v:16 idx:16 )
+    #0001 ADD2 ( _ idx+1:16 v:16 )
+    example-call-stack-level-2 ( we do the same again with v+1:16 )
+    ( when we return here, the local array is still on the stack )
+    ( array+idx:16 )
+    ( LDA2 v:16 )
+        #3118 DEO ws
+    pop-frame
+    JMP2
+( JMP2r )
+
+( _ v:16 idx:16 -- )
+@example-call-stack-level-2
+        #3218 DEO ws
+    SWP2 OVR2 ( _ idx:16 v:16 idx:16 -- )
+        DUP2 print16 nl
+    push-frame
+    #0008 alloc-local-array ( _ idx:16 v:16 idx:16 array:16 )
+    
+    ADD2 STA2k ( stores v at pos idx of the local array; _ idx:16 v:16 array+idx:16 )
+        print16 nl
+    ( ROT2 ROT2 _ array+idx:16 idx:16 v:16 )
+    ( ADD2 _ array+idx:16 v+idx:16 )
+    ( SWP2 v+idx:16 array+idx:16 )
+    POP2 POP2
+    example-call-stack-level-3
+    ( LDA2 v+idx:16 v:16 )
+
+        #3218 DEO ws
+    pop-frame
+    JMP2
+( JMP2r )
+
+
+@example-call-stack-level-3
+        #3318 DEO ws
+    push-frame
+    #0010 alloc-local-array
+        print16 nl
+        #3318 DEO ws
+    pop-frame
+    JMP2
+( JMP2r )
+
+@init-call-stack
+    ;call-stack .csp STZ2 ( 0800 )
+    ;call-stack .fp STZ2 ( frame pointer is initially 0, a null pointer )
+    #0000 ;call-stack STA2
+JMP2r
+
+@push-frame-pointer
+( write current fp at location of csp )
+( .csp LDZ2 print16 nl )
+    .fp LDZ2
+        DUP2 print16 ws ( print fp )
+    .csp LDZ2
+        DUP2 print16 ws ( print csp )
+    STA2
+    .csp LDZ2 .fp STZ2k POP
+    ( increment csp )
+    ( .csp LDZ2  )
+    INC2 INC2 .csp STZ2 ( 0802 )
+JMP2r
+
+@push-return-address
+    ( write current ra at location of csp )
+    ROT2r ( the call to push-frame and the current call have addresses on the stack  )
+    STH2r ( we actually remove the ra )
+        DUP2 print16 nl ( print ra )
+    ( ROT2r ROT2r )
+    .csp LDZ2 STA2
+    ( increment csp )
+    .csp LDZ2 
+    INC2 INC2 .csp STZ2 ( 0804 )
+JMP2r
+
+@push-short
+    .csp LDZ2 STA2
+    .csp LDZ2 INC2 INC2 .csp STZ2
+JMP2r
+
+@push-frame
+    push-frame-pointer
+    push-return-address
+    #4318 DEO ws .csp LDZ2 print16 nl
+JMP2r
+
+@pop-frame
+        .fp LDZ2 INC2 INC2 DUP2 print16 ws
+        LDA2 DUP2 print16 ws ( the return address )
+    ( set csp to fp )
+    .fp LDZ2 DUP2 .csp STZ2 
+    ( set fp to pref fp )
+    LDA2 .fp STZ2 ( -- )
+    ( print fp and csp )
+        .fp LDZ2 print16 ws
+        .csp LDZ2 print16 nl
+    ( .fp LDZ2 INC2 INC2 LDA2 JMP2 )
+
+JMP2r
+
+( nbytes:16 -- array:16 )
+@alloc-local-array
+    .csp LDZ2 DUP2 ROT2 ROT2 ADD2 .csp STZ2
+JMP2r
+
+( the print* JSR2s do not affect the stack )
+( b8 & 0x0f )
+@lonib
+    #0f AND
+    JMP2r
+( b8 >> 4 )
+@hinib
+    #04 SFT
+    JMP2r
+
+( if <10 then 30 else 57 )
+( implemented as (a<10)*0x30+(a>=10)*0x57 )
+@h2a
+    DUP ( h h )
+    #0a LTH ( h (h<10) )
+    DUP ( h (h<10) )
+    #01 SWP SUB ( h (h<10) 1-(h<10) )
+    #57 MUL ( h (h<10) (1-(h<10))*0x57 )
+    SWP ( h (1 (h<10))*0x57 (h<10) )
+    #30 MUL ( h (1 (h<10))*0x57 (h<10)*0x30 )
+    ADD ( h (1 (h<10))*0x57 (h<10)*0x30 )
+    ADD ( h+(1 (h<10))*0x57 (h<10)*0x30 )
+    JMP2r
+
+( print a byte b as hex )
+( b -- )
+@print8
+    DUP ( b b )
+    DUP ( b b b )
+    ;lonib JSR2 ( b lo )
+    ;h2a JSR2 ( b lo_a )
+    SWP ( lo_a b )
+    ;hinib JSR2 ( lo_a hi )
+    ;h2a JSR2 ( lo_a hi_a )
+    #18 DEO #18 DEO POP
+    JMP2r
+
+( print a 2-byte "short" word as hex )
+@print16
+    SWP
+    ;print8 JSR2
+    ( SWP )
+    ;print8 JSR2
+    JMP2r
+
+@nl #0a18 DEO JMP2r
+@ws #2018 DEO JMP2r
+
+|0800
+@call-stack ( grows down )
