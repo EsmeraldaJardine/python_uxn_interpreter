@@ -9,8 +9,7 @@
 		INC2 DUP2 LDA ( we increment the address and load it to get the next character.
         Again we keep the address on the stack )
         #00 NEQ ( so we test if the character value is not equal to zero )
-        ,&while JCN ( JCN means "jump with condition, it means we go back to the label &while as long as the condition is true. The last character in the string is a zero byte, so when we read that the condition is false and we finish
-        )
+        ,&while JCN ( JCN means "jump with condition, it means we go back to the label &while as long as the condition is true. The last character in the string is a zero byte, so when we read that the condition is false and we finish )
 	POP2 ( clean up the stack )
 
 

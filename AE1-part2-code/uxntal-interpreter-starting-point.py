@@ -287,64 +287,6 @@ def tokeniseProgramText(programText):
     #! ...
     return [] #! replace this with the actual code
 
-#!! Complete the parser
-def parseToken(tokenStr):
-    if tokenStr[0] == '#':
-        valStr=tokenStr[1:]
-        val = int(valStr,16)
-        if len(valStr)==2:
-            return (T.LIT,val,1)
-        else:
-            return (T.LIT,val,2)
-    elif tokenStr[0] == ';':
-        val = tokenStr[1:]
-        return (T.REF,val)
-#!! Handle relative references `,`
-    # elif tokenStr[0] == ...
-    #     ...
-    #     return (...)
-    elif tokenStr[0] == '@':
-        val = tokenStr[1:]
-        return (T.LABEL,val)
-#!! Handle relative labels `&`
-    # elif tokenStr[0] == ...
-    #     ...
-    #     return (...)
-    elif tokenStr == '|0100':
-        return (T.MAIN,)
-#! Handle absolute padding (optional)
-    # elif tokenStr[0] == ...
-    #     ...
-    #     return (...)
-#! Handle relative padding (optional)
-    # elif tokenStr[0] == ...
-    #     ...
-    #     return (...)
-    elif tokenStr[0].isupper():
-        # Any token string starting with an uppercase letter is considered an instruction
-        if len(tokenStr) == 3:
-            return (T.INSTR,tokenStr[0:len(tokenStr)],1,0,0)
-        elif len(tokenStr) == 4:
-            if tokenStr[-1] == '2':
-                return (T.INSTR,tokenStr[0:len(tokenStr)-1],2,0,0)
-            elif tokenStr[-1] == 'r':
-                return (T.INSTR,tokenStr[0:len(tokenStr)-1],1,1,0)
-            elif tokenStr[-1] == 'k':
-                return (T.INSTR,tokenStr[0:len(tokenStr)-1],1,0,1)
-        elif len(tokenStr) == 5:
-            # Order must be size:stack:keep
-            if tokenStr[len(tokenStr)-2:len(tokenStr)] == '2r':
-                return (T.INSTR,tokenStr[0:len(tokenStr)-2],2,1,0)
-            elif tokenStr[len(tokenStr)-2:len(tokenStr)] == '2k':
-                return (T.INSTR,tokenStr[0:len(tokenStr)-2],2,0,1)
-            elif tokenStr[len(tokenStr)-2:len(tokenStr)] == 'rk':
-                return (T.INSTR,tokenStr[0:len(tokenStr)-2],1,1,1)
-        elif len(tokenStr) == 6:
-            return (T.INSTR,tokenStr[0:len(tokenStr)-1],2,1,1)
-    else:
-        # we assume this is a 'raw' byte or short
-        return (T.RAW,int(tokenStr,16))
-
 # This is the first pass of the assembly process
 # We store the tokens in memory and build a dictionary
 # uxn.symbolTable: label => address
@@ -368,6 +310,8 @@ def populateMemoryAndBuildSymbolTable(tokens,uxn):
 # Once the symbol table has been built, replace every symbol by its address
 #!! Implement the code to replace every label reference by an address
 #! Note that label references are `REF` tokens and the memory stores the symbolTable as `LIT` tokens
+#! Loop over all tokens in `uxn.memory``. If a token is `REF`, look it up in `uxn.symbolTable`` and create a `LIT` token that contains its address. Write that to the memory.
+#! (This is what happens in Uxn: `;label` is the same as `LIT2 =label` and that gets replaced by `LIT2 address`)
 
 #! def resolveSymbols(uxn):
 #!  ...
