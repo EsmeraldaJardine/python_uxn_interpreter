@@ -19,7 +19,7 @@ BRK
     &for
     ( DUP #30 ADD #18 DEO  )
     ( action n #0000 ) 
-    INC2 ( increment ) ( action n #0001 )     
+    INC2 ( increment ; action n #0001 )     
     ROT2 ( n  #0001 action )
     OVR2 OVR2 ( n #0001 action #0001 action )    
     ( POP2 POP2  )

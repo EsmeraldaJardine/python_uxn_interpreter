@@ -34,9 +34,9 @@ BRK
     push-frame
     #0008 alloc-local-array ( _ idx:16 v:16 idx:16 array:16 )
     ADD2 STA2k ( stores v at pos idx of the local array; _ idx:16 v:16 array+idx:16 )
-    print16 nl ( -- )
-    SWP2 ( _ array+idx:16 idx:16 v:16 )
-    #0001 ADD2 SWP2 ( _ array+idx:16 v+1:16 idx:16 )
+    print16 nl ( prints the address of array[idx], array+idx )
+    SWP2 ( _ v:16 idx:16 )
+    #0001 ADD2 ( _ idx+1:16 v:16 )
     example-call-stack-level-2 ( we do the same again with v+1:16 )
     ( when we return here, the local array is still on the stack )
     ( array+idx:16 )
@@ -45,11 +45,14 @@ BRK
     pop-frame
 JMP2r
 
+( _ v:16 idx:16 -- )
 @example-call-stack-level-2
     #3218 DEO ws
     SWP2 OVR2 ( _ idx:16 v:16 idx:16 -- )
+    DUP2 print16 nl
     push-frame
     #0008 alloc-local-array ( _ idx:16 v:16 idx:16 array:16 )
+    
     ADD2 STA2k ( stores v at pos idx of the local array; _ idx:16 v:16 array+idx:16 )
     print16 nl
     ( ROT2 ROT2 _ array+idx:16 idx:16 v:16 )
@@ -74,7 +77,7 @@ JMP2r
 JMP2r
 
 @init-call-stack
-    ;call-stack INC2 INC2 .csp STZ2
+    ;call-stack .csp STZ2 ( 0800 )
     ;call-stack .fp STZ2 ( frame pointer is initially 0, a null pointer )
     #0000 ;call-stack STA2
 JMP2r
@@ -89,7 +92,7 @@ JMP2r
     STA2
     .csp LDZ2 .fp STZ2
     ( increment csp )
-    .csp LDZ2 INC2 INC2 .csp STZ2
+    .csp LDZ2 INC2 INC2 .csp STZ2 ( 0802 )
 JMP2r
 
 @push-return-address
@@ -100,7 +103,7 @@ JMP2r
     ROT2r ROT2r
     .csp LDZ2 STA2
     ( increment csp )
-    .csp LDZ2 INC2 INC2 .csp STZ2
+    .csp LDZ2 INC2 INC2 .csp STZ2 ( 0804 )
 JMP2r
 
 @push-short
@@ -111,6 +114,7 @@ JMP2r
 @push-frame
     push-frame-pointer
     push-return-address
+    #4318 DEO ws .csp LDZ2 print16 nl
 JMP2r
 
 @pop-frame

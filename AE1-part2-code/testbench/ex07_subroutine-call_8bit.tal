@@ -1,5 +1,5 @@
 ( This is an example of how to call a subroutine, which is like a method in Java )
-( The subroutine will compute the sum of the squares of two bytes (8-bit integers) )
+( The subroutine will compute the sum of the squares of two 8-bit integers )
 |0100
 
 #04 #03 ( put 4 and 3 on the stack )
