@@ -114,7 +114,9 @@ JMP2r
     .fp LDZ2 LDA2 .fp STZ2
     ( print fp and csp )
         .fp LDZ2 print16 ws
-        .csp LDZ2 print16 nl
+        .csp LDZ2 print16 ws
+        .fp LDZ2 LDA2 print16 ws
+        .fp LDZ2 INC2 INC2 LDA2 print16 nl
 JMP2r
 
 ( nbytes:16 -- array:16 )
