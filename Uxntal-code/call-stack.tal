@@ -73,13 +73,13 @@ JMP2r
 JMP2r
 
 @init-call-stack
-    ;call-stack .csp STZ2
-    #0000 .fp STZ2 ( frame pointer is initially 0, a null pointer )
+    ;call-stack INC2 INC2 .csp STZ2
+    ;call-stack .fp STZ2 ( frame pointer is initially 0, a null pointer )
+    #0000 ;call-stack STA2
 JMP2r
 
 @push-frame-pointer
 ( write current fp at location of csp )
-
     .fp LDZ2 
         DUP2 print16 ws ( print fp )
     .csp LDZ2  
@@ -87,14 +87,14 @@ JMP2r
     STA2
     .csp LDZ2 .fp STZ2
     ( increment csp )
-    .csp LDZ2 INC2 .csp STZ2
+    .csp LDZ2 INC2 INC2 .csp STZ2
 JMP2r
 
 @push-return-address
     ( write current ra at location of csp )
     STH2rk .csp LDZ2 INC2 STA2
     ( increment csp )
-    .csp LDZ2 INC2 .csp STZ2
+    .csp LDZ2 INC2 INC2 .csp STZ2
 JMP2r
 
 @push-short
