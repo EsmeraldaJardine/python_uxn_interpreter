@@ -74,7 +74,7 @@ JMP2r
 JMP2r
 
 @init-call-stack
-    ;call-stack INC2 INC2 .csp STZ2
+    ;call-stack .csp STZ2
     ;call-stack .fp STZ2 ( frame pointer is initially 0, a null pointer )
     #0000 ;call-stack STA2
 JMP2r
