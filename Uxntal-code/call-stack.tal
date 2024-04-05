@@ -43,7 +43,11 @@ BRK
     ( LDA2 v:16 )
     #3118 DEO ws
     pop-frame
-JMP2r
+    POP2r JMP2
+    print16 ws
+    STH2rk print16 nl
+    STH2r JMP2
+( JMP2r )
 
 ( _ v:16 idx:16 -- )
 @example-call-stack-level-2
@@ -64,7 +68,11 @@ JMP2r
 
     #3218 DEO ws
     pop-frame
-JMP2r
+    POP2r JMP2
+    print16 ws
+    STH2rk print16 nl
+    STH2r JMP2
+( JMP2r )
 
 
 @example-call-stack-level-3
@@ -74,7 +82,11 @@ JMP2r
     print16 nl
     #3318 DEO ws
     pop-frame
-JMP2r
+    POP2r JMP2
+    print16 ws
+    STH2rk print16 nl
+    STH2r JMP2
+( JMP2r )
 
 @init-call-stack
     ;call-stack .csp STZ2 ( 0800 )
@@ -118,24 +130,27 @@ JMP2r
 JMP2r
 
 @pop-frame
-        .fp LDZ2 INC2 INC2 print16 ws
-        .fp LDZ2 INC2 INC2 LDA2 print16 ws
+        .fp LDZ2 INC2 INC2 DUP2 print16 ws
+        LDA2 DUP2 print16 ws ( the return address )
     ( set csp to fp )
-    .fp LDZ2 .csp STZ2
+    .fp LDZ2 DUP2 .csp STZ2 
     ( set fp to pref fp )
-    .fp LDZ2 LDA2 .fp STZ2
+    LDA2 .fp STZ2 ( -- )
     ( print fp and csp )
         .fp LDZ2 print16 ws
         .csp LDZ2 print16 nl
     ( .fp LDZ2 INC2 INC2 LDA2 JMP2 )
+    ( check the actual value on the return stack )
+    SWP2r
+    #5218 DEO ws STH2rk DUP2 print16 nl
+    SWP2r
+
 JMP2r
 
 ( nbytes:16 -- array:16 )
 @alloc-local-array
     .csp LDZ2 DUP2 ROT2 ROT2 ADD2 .csp STZ2
 JMP2r
-
-
 
 ( the print* JSR2s do not affect the stack )
 ( b8 & 0x0f )

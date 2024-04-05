@@ -291,7 +291,7 @@ as a decimal number of 5 digits )
 
 ( To print a string )
 ( The string starts with a 2-byte lenght field )
-@print-str ( a* -: )
+@print-str ( str* -: )
     LDA2k ( ;str size )
     SWP2 #0002 ADD2 SWP2 ( ;str+2 size )
     DUP2 ( ;str+2 size size )
@@ -303,7 +303,7 @@ as a decimal number of 5 digits )
     INC2 SWP2 #0001 SUB2 DUP2 ( ;str+3 size-1 size-1 )
     ,&loop JMP
     &exit
-    POP2 POP2 POP2
+    POP2 POP2
     JMP2r
 
 ( example strings )
