@@ -26,7 +26,9 @@ BRK
 !todo
 
 @free ( ptr n_bytes )
-    SWP2 #f000 SUB2 PAGE_SZ DIV2
+    SWP2 #f000 SUB2 PAGE_SZ DIV2 ( n_bytes idx )
+    SWP2 ( idx n_bytes )
+    #0001 SUB2 PAGE_SZ DIV2 #0001 ADD2 ( bytes to pages; idx n_pages )
     ;free_alloc_sz_at_idx JMP2
 
 @get_bit ( idx -- bit )
