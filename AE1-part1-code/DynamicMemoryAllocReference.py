@@ -26,7 +26,8 @@ def malloc(n_bytes) :
 
 def free(ptr,n_bytes) :
     idx = (ptr-VMEM_START)/PAGE_SZ
-    free_alloc_sz_at_idx(idx, n_bytes)
+    n_pages = ((n_bytes-1) // PAGE_SZ) + 1 # integer division
+    free_alloc_sz_at_idx(idx, n_pages)
 
 def get_bit(idx) :
     byte_idx = idx >> 3
@@ -75,7 +76,7 @@ def claim_alloc_sz_at_idx(idx, alloc_sz) :
         set_bit(idx+jj)
 
 # allocation size is in pages
-def free_alloc_sz_at_idx(idx, alloc_sz) : 
+def free_alloc_sz_at_idx(idx, alloc_sz) :
     for jj in range(alloc_sz):
         clear_bit(idx+jj)
 
