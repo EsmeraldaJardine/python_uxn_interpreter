@@ -1,0 +1,75 @@
+( 
+# returns a byte where the bit at position bit_idx is 0    
+def mask_clear(bit_idx):
+    return (0xFF ^ (1 << bit_idx))
+
+# allocation size is in pages
+def alloc_sz_is_free_at_idx(idx, alloc_sz) :
+    for jj in range(alloc_sz) : 
+        if(idx+jj>N_PAGES-1):
+            return 0 
+        if (get_bit(idx+jj)==1):
+            return 0 
+    return 1
+)
+
+( allocation size is in pages )
+( idx:16 alloc_sz:16 -- 00 or 01 )
+@alloc_sz_is_free_at_idx ( idx* alloc_sz* -: b )
+    ;&alloc_sz STA2 ;idx STA2 ( same as writing ;alloc_sz_is_free_at_idx/idx )
+    ( for jj = 0 to alloc_sz-1 )
+    #0000 ;&jj STA2 ( idx:16 alloc_sz:16 )
+    &loop 
+        ( if jj < alloc_sz )
+        ;&jj LDA2 ;&alloc_sz LDA2 LTH2 
+        ,&body JCN ( goto body )
+        ,&done JMP ( else goto done )
+        &body 
+        ( if idx+jj > N_PAGES-1 goto ret_0 )
+        ;&idx LDA2 ;&jj LDA2 ADD2 N_PAGES #0001 SUB2 GTH2 ,&ret_0 JCN 
+        ( if get_bit(idx+jj) goto ret_0 )
+        ;&idx LDA2 ;&jj LDA2 ADD2 ;get_bit JSR2 ,&ret_0 JCN
+        ;&jj LDA2 INC2 ;&jj STA2
+        ,&loop JMP ( jump back to the top of the loop )
+        &ret_0 
+        ( return 0 )
+        #00 JMP2r
+    &done 
+    ( return 0 )
+    #01
+JMP2r
+&idx $2 &alloc_sz $2 
+&jj $2 ( this could also go on the zero page as it is reusable )
+( &idx is *literally* the same as @alloc_sz_is_free_at_idx/idx )
+
+( return (0xFF ^ (1 << bit_idx)) )
+(
+    assume bit_idx is 5
+0xFF         = 11111111
+1 << bit_idx = 00100000 
+XOR         =  11011111
+)
+@mask_clear ( bit_idx:16 -- mask:8 )
+    ;&bit_idx STA2 
+    #01 ;&bit_idx LDA2 NIP ( bit_idx is a short, we need to remove the high byte )
+    #40 SFT ( left shift << uses the high nibble of the byte so we must shift this by 4 places to the left )
+    SFT ( now this SFT is a left shift of bit_idx positions )
+    ( In short: 
+        byte #40 SFT SFT is a left-shift, <<
+        byte SFT is a right-shift, >>
+        Note the first argument of SFT is always only a byte, 
+        even if it is SFT2, as explained in the Uxntal documentation:
+
+https://wiki.xxiivv.com/site/uxntal_reference.html
+
+SFT ( a shift8 -- c ) Shifts the bits of the second value of the stack to the left or right, depending on the control value at the top of the stack. The high nibble of the control value indicates how many bits to shift left, and the low nibble how many bits to shift right. The rightward shift is done first.
+
+#34 #10 SFT        ( 68 )
+#34 #01 SFT        ( 1a )
+#34 #33 SFTk       ( 34 33 30 )
+#1248 #34 SFTk2    ( 12 48 34 09 20 )
+    )
+    #ff ( 0xFF )
+    EOR ( ^ )
+JMP2r
+&bit_idx $2

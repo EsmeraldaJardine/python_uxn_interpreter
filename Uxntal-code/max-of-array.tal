@@ -4,8 +4,9 @@
 BRK
 
 @max-of-array ( upper-bound+1 lower-bound -- )
+    ( for i = 0 to n-1 )
     ;&i STA ( store exp1 in i; exp2 )
-    &loop 
+    &loop
         DUP ( because exp2 will be consumed; exp2 exp2 )
         ;&i LDA ( load the iterator )
         SWP ( swap because we need i>exp2, not exp2>i )

@@ -174,9 +174,9 @@ def testClaimAllocSzAtIdx() :
     print("part2")
     # claim alloc
     claim_alloc_sz_at_idx(108, 16)
-    # check if region beyond it is free
+    # check if region beyond it is free, prints 1
     print (alloc_sz_is_free_at_idx(124, 16))
-    # check if region itself is claimed
+    # check if region itself is claimed, prints 0
     print (alloc_sz_is_free_at_idx(108, 16))
     
 def testFreeAllocSzAtIdx() : 
@@ -191,6 +191,7 @@ testMaskSet()
 testGetBit()
 testClearBit()
 testSetBit()
+setBitmap()
 testAllocSzIsFreeAtIdx()
 testClaimAllocSzAtIdx()
 testFreeAllocSzAtIdx()

@@ -79,4 +79,11 @@ def free_alloc_sz_at_idx(idx, alloc_sz) :
     for jj in range(alloc_sz):
         clear_bit(idx+jj)
 
-
+def setBitmap():
+    bitmap[1]= 0x03
+    bitmap[3]= 0xc0
+    bitmap[4]= 0x07
+    bitmap[8]= 0x60
+    bitmap[12]= 0x0e
+    bitmap[13]= 0x30
+    print(bitmap)
