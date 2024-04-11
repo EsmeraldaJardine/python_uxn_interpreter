@@ -1,0 +1,62 @@
+Memory operations
+
+<1 byte> <2 bytes> STA -- (nothing)
+<2 bytes> <2 bytes> STA2 --  (nothing)
+
+<2 bytes> LDA -- <1 byte>
+<2 bytes> LDA2 -- <2 bytes>
+
+<1 byte> <1 byte> STR -- (nothing)
+<2 bytes> <1 byte> STR2 --  (nothing)
+
+<1 byte> LDR -- <1 byte>
+<1 byte> LDR2 -- <2 bytes>
+
+<1 byte> <1 byte> STZ -- (nothing)
+<2 bytes> <1 byte> STZ2 --  (nothing)
+
+<1 byte> LDZ -- <1 byte>
+<1 byte> LDZ2 -- <2 bytes>
+
+Jumps
+
+<1 byte> <1 byte> JCN -- (nothing)  
+<1 byte> <2 bytes> JCN2 -- (nothing)
+
+<1 byte> JMP -- (nothing)
+<2 bytes> JMP2 -- (nothing)
+
+<1 byte> JSR (don't use this!)
+<2 bytes> JSR2 -- (nothing) 
+
+Shift 
+
+<1 byte> <1 byte> SFT -- <1 byte>
+<2 bytes> <1 byte> SFT2 -- <2 bytes>
+
+Other arithmetic and logic ops: 
+<1 byte> <1 byte> ADD, SUB, ORA etc -- <1 byte>
+<2 bytes> <2 bytes> ADD2, SUB2, ORA2 etc -- <2 bytes>
+
+Comparison operations
+
+<1 byte> <1 byte> EQU,LTH etc -- <1 byte>
+<2 bytes> <2 bytes> EQU2,LTH2 etc -- <1 byte>
+
+
+Stack manipulation: 
+
+<1 byte> <1 byte> NIP <1 byte> 
+<2 bytes> NIP <1 byte> 
+<2 bytes> <2 bytes> NIP2 <2 bytes> 
+
+<1 byte> <1 byte> SWP -- <1 byte> <byte>
+<2 bytes> <2 bytes> SWP2 -- <2 bytes> <2 bytes> 
+ 
+
+and similar for ROT, DUP, OVR
+
+
+   
+
+
