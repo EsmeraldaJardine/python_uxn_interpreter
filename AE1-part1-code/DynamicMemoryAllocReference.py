@@ -6,7 +6,7 @@
 PAGE_SZ = 16 # in bytes
 # We have a total of 256 pages, so we can allocate at most 4kB
 N_PAGES = 1024>>2 
-VMEM_START = 64*1024-PAGE_SZ*N_PAGES
+DMEM_START = 64*1024-PAGE_SZ*N_PAGES
 
 # N_PAGES bits, packed in bytes mean N_PAGES/8 entries, so with the above, the bitmap will take 64 bytes
 # 0 means free
@@ -21,11 +21,11 @@ def malloc(n_bytes) :
     for idx in range(N_PAGES): # 0 .. N_PAGES-1
         if alloc_sz_is_free_at_idx(idx, n_pages):
             claim_alloc_sz_at_idx(idx, n_pages)
-            return (idx*PAGE_SZ+VMEM_START)
+            return (idx*PAGE_SZ+DMEM_START)
     return 0 # Null pointer
 
 def free(ptr,n_bytes) :
-    idx = (ptr-VMEM_START)/PAGE_SZ
+    idx = (ptr-DMEM_START)/PAGE_SZ
     n_pages = ((n_bytes-1) // PAGE_SZ) + 1 # integer division
     free_alloc_sz_at_idx(idx, n_pages)
 
