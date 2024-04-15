@@ -278,7 +278,50 @@ JMP2r
 as a decimal number of 5 digits )
 ( x:16 -> -- )
 ( x* -: )
-@print16-dec
+
+@print16-dec ( 0x2710 = 10,000; 0x03e8 = 1000; 0x64 = 1000; 0x0a = 10 )
+    DUP2 ( x:16 x:16 )
+    DUP2 #2710 LTH2 ,&d2 JCN
+    ( if there is something to print in 10k col... )
+    #2710 DIV2 ( x:16 T:16 ) DUP #30 ADD #18 DEO
+    ( Dt = x - 10000*T )
+    #2710 MUL2 SUB2 ( Dt )
+    DUP2 ( Dt Dt )
+    &d2_0 ( assumes 10k is written )
+        #03e8 DIV2 ( Dt D ) DUP #30 ADD #18 DEO
+        ( ht = Dt-D*1000 )
+        #03e8 MUL2 SUB2  ( ht )
+        DUP2
+        ,&d3_0 JMP ( 10k is used so jump to adjusted d3 )
+    &d3_0 ( assumes 1k is written )
+        #0064 DIV2 ( ht h ) DUP #30 ADD #18 DEO
+        ( tt = ht - h*100 )
+        #0064 MUL2 SUB2 ( tt )
+        DUP2 ( tt tt )
+    &d4 ( print 10s and units )
+        ( t = tt / 10 )
+        #000a DIV2 ( tt t ) DUP #30 ADD #18 DEO ( print 10s col ...  OK )
+        ( e = tt - 10*t )
+        #000a MUL2 SUB2 ( e ) #30 ADD #18 DEO POP ( print units ... OK )
+        JMP2r
+    &d2 ( assumes 10k col is n/a )
+        DUP2 #03e8  LTH2 ,&d3 JCN
+        ( D = Dt / 1000 )
+        #03e8 DIV2 ( Dt D ) DUP #30 ADD #18 DEO
+        ( ht = Dt-D*1000 )
+        #03e8 MUL2 SUB2  ( ht )
+        DUP2 ( ht ht )
+        ,&d3_0 JMP ( 10k col used so jmp to adjusted d3 )
+    &d3 ( assumes 1k col is n/a )
+        DUP2 #0064  LTH2 ,&d4 JCN
+        ( h = ht /100 )
+        #0064 DIV2 ( ht h ) DUP #30 ADD #18 DEO
+        ( tt = ht - h*100 )
+        #0064 MUL2 SUB2 ( tt )
+        DUP2 ( tt tt )
+        ,&d4 JMP
+        
+@print16-dec-NOK
     DUP2 ( x:16 x:16 )
     DUP2 #2710 LTH2 ,&d2 JCN
     ( T = x/10000 )
