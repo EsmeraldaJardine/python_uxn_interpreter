@@ -124,7 +124,7 @@ def load(args,sz, uxn):
 # JSR
 def call(args,sz,uxn):
     # print("CALL:",args[0],uxn.progCounter)
-    uxn.stacks[1].append(uxn.progCounter)
+    uxn.stacks[1].append( (uxn.progCounter,2) )
     uxn.progCounter = args[0]-1
 # JMP
 def jump(args,sz,uxn):
@@ -229,7 +229,7 @@ def executeInstr(token,uxn):
         else:
             print('')
         if VV:
-            print('PC:',uxn.pc,' (WS,RS):',uxn.stacks)
+            print('PC:',uxn.progCounter,' (WS,RS):',uxn.stacks)
         exit(0)
     action,nArgs,hasRes = callInstr[instr]
     if nArgs==0: # means it is a stack manipulation
