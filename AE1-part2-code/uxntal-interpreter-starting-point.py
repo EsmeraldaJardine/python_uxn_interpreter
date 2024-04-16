@@ -6,6 +6,7 @@
 from enum import Enum
 
 #! Your program could set these flags on command line
+WW = False
 V = False # Verbose, explain a bit what happens
 VV = False # More verbose, explain in more detail what happens
 DBG = False # Debug info
