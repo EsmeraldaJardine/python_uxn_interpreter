@@ -13,14 +13,28 @@ Given a mobile device (e.g. an iPad) that communicates with a server in a cloud.
 
 (i)	What is the total carbon footprint of this activity (i.e. cloud + all end users)? Explain the calculation.
 
-n_servers*(carbon_intensity*PUE*server_kWh + server_use_time*server_embodied/server_lifetime)
-+ n_tablets*(carbon_intensity*PUE*tablet_kWh + tablet_use_time*tablet_embodied/tablet_lifetime)
-1000*(0.2*1.4*0.2 + 0.5*1400/40000 ) + 10000000*( 0.002*0.2 = 0.5*120/15000+)
-= (2*14*2 + 70/4) + 1000*( 2*2 + 240/6)
-= 4*14+17.5 + 1000*(4+40)
-= 56+17.5 + 44000
+    n_servers*(
+        carbon_intensity*PUE*server_power_consumption*server_use_time + 
+        server_use_time*server_embodied/server_lifetime
+    )
+    + n_tablets*(
+        carbon_intensity*tablet_power_consumption*tablet_use_time + 
+        tablet_use_time*tablet_embodied/tablet_lifetime
+    )
 
-= 44.0735 ton CO2e: 73.5 kg for the cloud, 44 ton for the tablets.
+    = 1000*(
+        0.2*1.4*0.2*0.5 + 
+        0.5*1400/40000 
+        ) + 
+        10000000*( 
+            0.002*0.2*0.5 + 
+            0.5*120/15000
+        )
+    = (2*14*1 + 70/4) + 1000*(2*1 + 240/6)
+    = 28+17.5 + 1000*(2+40)
+    = 45.5 + 42000
+
+= 42.0455 ton CO2e: 45.5 kg for the cloud, 42 ton for the tablets.
 
 
 (ii) How do the contribution to the emissions (embodied/from use; cloud/end user) compare in this case?
