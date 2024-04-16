@@ -41,7 +41,8 @@ class T(Enum):
 # We use an object to group the data structures used by the Uxn interpreter
 class Uxn:
     memory = [(T.EMPTY,)] * 0x10000 # The memory stores *tokens*, not bare values
-    stacks = ([],[]) # ws, rs # The stacks store bare values, i.e. bytes
+    stacks = ([],[]) # ws, rs # The stacks store bare values as tuples (value, size)
+    # where size is the size in bytes (1=byte, 2=short)
     progCounter = 0
     symbolTable={}
     # First unused address, only used for verbose

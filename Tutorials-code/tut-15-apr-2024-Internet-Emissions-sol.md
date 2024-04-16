@@ -34,7 +34,7 @@ Given a mobile device (e.g. an iPad) that communicates with a server in a cloud.
     = 28+17.5 + 1000*(2+40)
     = 45.5 + 42000
 
-= 42.0455 ton CO2e: 45.5 kg for the cloud, 42 ton for the tablets.
+    = 42.0455 ton CO2e: 45.5 kg for the cloud, 42 ton for the tablets.
 
 
 (ii) How do the contribution to the emissions (embodied/from use; cloud/end user) compare in this case?
