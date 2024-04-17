@@ -132,8 +132,8 @@ def jump(args,sz,uxn):
     uxn.progCounter = args[0]
 # JCN
 def condJump(args,sz,uxn):
-    if args[0] == 1:
-        uxn.progCounter = args[0]-1
+    if args[1] == 1 :
+        uxn.pc = args[0]-1
 
 # Stack manipulation operations
 # STH
