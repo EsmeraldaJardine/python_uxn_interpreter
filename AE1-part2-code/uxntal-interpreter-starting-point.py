@@ -116,7 +116,8 @@ def parseToken(tokenStr):
 # Memory operations
 # STA
 def store(args,sz,uxn):
-    uxn.memory[args[1]] = ('RAW',args[0],0)
+    uxn.memory[args[0]] = ('RAW',args[1],0)
+
 # LDA
 def load(args,sz, uxn):
     return uxn.memory[args[0]][1] # memory has tokens, stacks have values
@@ -133,7 +134,7 @@ def jump(args,sz,uxn):
 # JCN
 def condJump(args,sz,uxn):
     if args[1] == 1 :
-        uxn.pc = args[0]-1
+        uxn.progCounter = args[0]-1
 
 # Stack manipulation operations
 # STH
