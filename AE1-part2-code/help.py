@@ -8,7 +8,7 @@ from enum import Enum
 #! Your program could set these flags on command line
 WW = False
 V = False # Verbose, explain a bit what happens
-VV = False # More verbose, explain in more detail what happens
+VV = True # More verbose, explain in more detail what happens
 DBG = False # Debug info
 
 #!! Your program should read the program text from a `.tal` file
@@ -194,13 +194,13 @@ def add(args,sz,uxn):
 
 #!! Implement SUB, MUL, DIV, INC (similar to `ADD`)
 def sub(args,sz,uxn):
-    return args[0] - args[1]
+    return args[1] - args[0]
 
 def mul(args,sz,uxn):
     return args[0] * args[1]
 
 def div(args,sz,uxn):
-    return args[0] // args[1]
+    return args[1] // args[0]
 
 def inc(args,sz,uxn):
     return args[0] + 1
@@ -327,7 +327,6 @@ def tokeniseProgramText(programText):
     strippedProgramText = stripComments(programText)
     tokens = strippedProgramText.split()
     tokenStrings.extend(tokens)
-    print(tokenStrings)
     return tokenStrings
 
 def stripComments(programText):
@@ -399,6 +398,7 @@ def runProgram(uxn):
             print('PC:',uxn.progCounter,' TOKEN:',token)
 #!! if the token is a LIT, its *value* goes on the working stack
         if token[0] == T.LIT:
+            print("token 0: ",token[0], "token 1: ",token[1])
             uxn.stacks[0].append((token[1],token[2]))
         elif token[0] == T.INSTR:
 #!! otherwise it is an instruction and it is executed using `executeInstr(token,uxn)`
@@ -431,7 +431,7 @@ for item in tokensWithStrings:
         tokens.append(item)
 
 populateMemoryAndBuildSymbolTable(tokens,uxn)
-
+print("symbol table: ", uxn.symbolTable)
 resolveSymbols(uxn)
 
 if DBG:
