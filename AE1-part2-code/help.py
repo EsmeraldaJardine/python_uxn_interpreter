@@ -326,7 +326,8 @@ def tokeniseProgramText(programText):
     tokenStrings = []
     strippedProgramText = stripComments(programText)
     tokens = strippedProgramText.split()
-    tokenStrings.append(tokens)
+    tokenStrings.extend(tokens)
+    print(tokenStrings)
     return tokenStrings
 
 def stripComments(programText):
@@ -418,6 +419,7 @@ def runProgram(uxn):
 uxn = Uxn()
 #programText_noComments = stripComments(programText)
 tokenStrings = tokeniseProgramText(programText)
+#print(tokenStrings)
 tokensWithStrings = map(parseToken,tokenStrings)
 
 tokens=[]
