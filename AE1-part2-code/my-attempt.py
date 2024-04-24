@@ -239,7 +239,7 @@ callInstr = {
     'NEQ' : (neq,2,True),
     'LTH' : (lth,2,True),
     'GTH' : (gth,2,True),
-    'DEO' : (lambda args,sz,uxn : print(chr(args[1]),end=''),2,False),
+    'DEO' : (lambda args,sz,uxn : print(chr(args[1][0]),end=''),2,False),
     'JSR' : (call,1,False),
     'JMP' : (jump,1,False),
     'JCN' : (condJump,2,False),
@@ -269,46 +269,49 @@ def executeInstr(token,uxn):
             print('PC:',uxn.progCounter,' (WS,RS):',uxn.stacks)
         exit(0)
     action,nArgs,hasRes = callInstr[instr]
-    if nArgs==0: # means it is a stack manipulation
-        action(rs,sz,uxn)
-    else:
-        args=[]
-        for i in reversed(range(0,nArgs)):
-            if keep == 0:
-                arg = uxn.stacks[rs].pop()
-                if arg[1]==2 and sz==1 and (instr != 'LDA' and instr!= 'STA'):
-                    if WW:
-                        print("Warning: Args on stack for",instr,sz,"are of wrong size (short for byte)")
-                    uxn.stacks[rs].append((arg[0]>>8))
-                    args.append((arg[0]&0xFF))
-                else: # either 2 2 or 1 1 or 1 2
-                    args.append(arg[0]) # works for 1 1 or 2 2
-                    if arg[1]==1 and sz==2:
-                        arg1 = arg
-                        arg2 = uxn.stacks[rs].pop()
-                        if arg2[1]==1 and sz==2:
-                            arg = (arg2[0]<<8) + arg1[0]
-                            args.append(arg) # a b 
-                        else:
-                            print("Error: Args on stack are of wrong size (short after byte)")
-                            exit()
-            else:
-                arg = uxn.stacks[rs][i]
-                if arg[1]!= sz and (instr != 'LDA' and instr!= 'STA'):
-                    print("Error: Args on stack are of wrong size (keep)")
-                    exit()
-                else:
-                    args.append(arg[0])
-        if VV:
-            print('EXEC INSTR:',instr, 'with args', args)
-        if hasRes:
-            res = action(args,sz,uxn)
-            if instr == 'EQU' or instr == 'NEQ' or instr == 'LTH' or instr == 'GTH':
-                uxn.stacks[rs].append( (res,1) )
-            else:
-                uxn.stacks[rs].append( (res,sz) )
+    #code removed from line 274 of starting point
+    args= []
+    for i in reversed(range(0,nArgs)):
+        if keep == 0:
+            arg = uxn.stacks[rs].pop()
+            if arg[1]==2 and sz==1 and (instr != 'LDA' and instr!= 'STA'):
+                if WW:
+                    print("Warning: Args on stack for",instr,sz,"are of wrong size (short for byte)")
+                uxn.stacks[rs].append((arg[0]>>8))
+                args.append((arg[0]&0xFF))
+            else: # either 2 2 or 1 1 or 1 2
+                args.append(arg[0]) # works for 1 1 or 2 2
+                if arg[1]==1 and sz==2:
+                    arg1 = arg
+                    arg2 = uxn.stacks[rs].pop()
+                    if arg2[1]==1 and sz==2:
+                        arg = (arg2[0]<<8) + arg1[0]
+                        args.append(arg) # a b 
+                    else:
+                        print("Error: Args on stack are of wrong size (short after byte)")
+                        exit()
         else:
-            action(args,sz,uxn)
+            arg = uxn.stacks[rs][i]
+            if arg[1]!= sz and (instr != 'LDA' and instr!= 'STA'):
+                print("Error: Args on stack are of wrong size (keep)")
+                exit()
+            else:
+                args.append(arg[0])
+    for i in reversed(range(0, nArgs)):
+        args.append(uxn.stacks[rs].pop())
+    
+    if VV:
+        print('EXEC INSTR:',instr, 'with args', args)
+    if hasRes:
+        res = action(args,sz,uxn)
+        if instr == 'EQU' or instr == 'NEQ' or instr == 'LTH' or instr == 'GTH':
+            uxn.stacks[rs].append( (res,1) )
+        else:
+            uxn.stacks[rs].append( (res,sz) )
+    else:
+        print(f"{args=}")
+        action(args,sz,uxn)
+
 
 #!! Tokenise the program text using a function `tokeniseProgramText`
 #! That means splitting the string `programText` on whitespace
@@ -354,14 +357,11 @@ def populateMemoryAndBuildSymbolTable(tokens,uxn):
 
 
 def resolveSymbols(uxn):
-    for i, token in enumerate(uxn.memory):
-        if token[0] == T.REF:
-            labelName = token[1]
-            if labelName in uxn.symbolTable:
-                address = uxn.symbolTable[labelName]
-                uxn.memory[i] = (T.LIT, (address, 2))
-            else:
-                raise ValueError(f"label not defined: {labelName}")
+        for i, token in enumerate(uxn.memory):
+            if token[0] == T.REF:
+                refAddressToken = (T.LIT, uxn.symbolTable[token[1]], token[2])
+                uxn.memory[i] = refAddressToken
+                print("memory[i]: ",uxn.memory[i])
 
 
 
@@ -387,6 +387,7 @@ def runProgram(uxn):
             print('(WS,RS):',uxn.stacks)
 
 uxn = Uxn()
+
 #programText_noComments = stripComments(programText)
 tokenStrings = tokeniseProgramText(programText)
 tokensWithStrings = map(parseToken,tokenStrings)
