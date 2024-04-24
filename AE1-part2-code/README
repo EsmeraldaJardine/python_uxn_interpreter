@@ -1,0 +1,19 @@
+name: Esmeralda Jardine
+ID: 2391491j
+Python Interpolator Program for uxntal
+
+This program is supposed to read uxntal files, interpret and run them.
+
+Status Report: The program does not run. It reaches the first ADD instruction and raises an error at line 288, in executeInstr()
+    
+                            ***
+    if arg[1]==2 and sz==1 and (instr != 'LDA' and instr!= 'STA'):
+                            ***
+
+up to this point the return stack looks like this:
+[(17, 1), (269, 2), 1]
+
+|0100
+;array LDA
+;array #01 ADD <-ADD is not yet executed,this is where the program       crashes>
+
