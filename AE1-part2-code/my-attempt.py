@@ -12,18 +12,7 @@ DBG = True
 
 
 programText = """
-|0100
-;array LDA
-;array #01 ADD LDA
-ADD
-;print JSR2
-BRK
 
-@print
-    #18 DEO
-JMP2r
-
-@array 11 22 33
 """
 
 
@@ -258,8 +247,6 @@ callInstr = {
 
 def executeInstr(token,uxn):
     _t,instr,sz,rs,keep = token
-    print("token at execute: ",token)
-    print("instr: ",instr, "sz: ",sz, "rs: ",rs, "keep: ",keep)
     if instr == 'BRK':
         if V:
             print("\n",'*** DONE *** ')
@@ -269,48 +256,51 @@ def executeInstr(token,uxn):
             print('PC:',uxn.progCounter,' (WS,RS):',uxn.stacks)
         exit(0)
     action,nArgs,hasRes = callInstr[instr]
-    #code removed from line 274 of starting point
-    args= []
-    for i in reversed(range(0,nArgs)):
-        if keep == 0:
-            arg = uxn.stacks[rs].pop()
-            if arg[1]==2 and sz==1 and (instr != 'LDA' and instr!= 'STA'):
-                if WW:
-                    print("Warning: Args on stack for",instr,sz,"are of wrong size (short for byte)")
-                uxn.stacks[rs].append((arg[0]>>8))
-                args.append((arg[0]&0xFF))
-            else: # either 2 2 or 1 1 or 1 2
-                args.append(arg[0]) # works for 1 1 or 2 2
-                if arg[1]==1 and sz==2:
-                    arg1 = arg
-                    arg2 = uxn.stacks[rs].pop()
-                    if arg2[1]==1 and sz==2:
-                        arg = (arg2[0]<<8) + arg1[0]
-                        args.append(arg) # a b 
-                    else:
-                        print("Error: Args on stack are of wrong size (short after byte)")
-                        exit()
-        else:
-            arg = uxn.stacks[rs][i]
-            if arg[1]!= sz and (instr != 'LDA' and instr!= 'STA'):
-                print("Error: Args on stack are of wrong size (keep)")
-                exit()
-            else:
-                args.append(arg[0])
-    for i in reversed(range(0, nArgs)):
-        args.append(uxn.stacks[rs].pop())
-    
-    if VV:
-        print('EXEC INSTR:',instr, 'with args', args)
-    if hasRes:
-        res = action(args,sz,uxn)
-        if instr == 'EQU' or instr == 'NEQ' or instr == 'LTH' or instr == 'GTH':
-            uxn.stacks[rs].append( (res,1) )
-        else:
-            uxn.stacks[rs].append( (res,sz) )
+    if nArgs==0: # means it is a stack manipulation
+        action(rs,sz,uxn)
+        print("action:",action,"nArgs:",nArgs,"hasRes:",hasRes)
     else:
-        print(f"{args=}")
-        action(args,sz,uxn)
+        args=[]
+        for i in reversed(range(0,nArgs)):
+            if keep == 0:
+                print("return stack:",uxn.stacks[rs])
+                arg = uxn.stacks[rs].pop()
+                print("arg:",arg)
+                print("return stack:",uxn.stacks[rs])
+                if arg[1]==2 and sz==1 and (instr != 'LDA' and instr!= 'STA'):
+                    if WW:
+                        print("Warning: Args on stack for",instr,sz,"are of wrong size (short for byte)")
+                    uxn.stacks[rs].append( (arg[0]>>8,1) )
+                    args.append((arg[0]&0xFF))
+                else: # either 2 2 or 1 1 or 1 2
+                    args.append(arg[0]) # works for 1 1 or 2 2
+                    if arg[1]==1 and sz==2:
+                        arg1 = arg
+                        arg2 = uxn.stacks[rs].pop()
+                        if arg2[1]==1 and sz==2:
+                            arg = (arg2[0]<<8) + arg1[0]
+                            args.append(arg) # a b 
+                        else:
+                            print("Error: Args on stack are of wrong size (short after byte)")
+                            exit()
+            else:
+                arg = uxn.stacks[rs][i]
+                if arg[1]!= sz and (instr != 'LDA' and instr!= 'STA'):
+                    print("Error: Args on stack are of wrong size (keep)")
+                    exit()
+                else:
+                    args.append(arg[0])
+        if VV:
+            print('EXEC INSTR:',instr, 'with args', args)
+        if hasRes:
+            res = action(args,sz,uxn)
+            if instr == 'EQU' or instr == 'NEQ' or instr == 'LTH' or instr == 'GTH':
+                uxn.stacks[rs].append( (res,1) )
+            else:
+                uxn.stacks[rs].append( (res,sz) )
+        else:
+            action(args,sz,uxn)
+
 
 
 #!! Tokenise the program text using a function `tokeniseProgramText`
@@ -376,7 +366,8 @@ def runProgram(uxn):
             print('PC:',uxn.progCounter,' TOKEN:',token)
 #!! if the token is a LIT, its *value* goes on the working stack
         if token[0] == T.LIT:
-                uxn.stacks[0].append(token[1])
+                uxn.stacks[0].append(token[1:])
+                print("return stack lit:",uxn.stacks[1])
         elif token[0] == T.INSTR:
 #!! otherwise it is an instruction and it is executed using `executeInstr(token,uxn)`
             executeInstr(token,uxn)
